@@ -1,188 +1,173 @@
-create table if not exists contract(
- contract_id serial primary key ,
- contract_number varchar unique not null
+create table if not exists contract
+(
+    contract_id     serial primary key,
+    contract_number varchar unique not null
 );
-create table if not exists sales(
- sales_id serial primary key ,
- sales_plan_id integer unique not null,
- product_id integer unique not null,
- contract_id integer unique not null,
- constraint fk_sales_contract foreign key (contract_id) references
-contract(contract_id)
+create table if not exists sales
+(
+    sales_id      serial primary key,
+    sales_plan_id integer unique not null,
+    product_id    integer unique not null,
+    contract_id   integer unique not null,
+    constraint fk_sales_contract foreign key (contract_id) references
+        contract (contract_id)
 );
-create table if not exists product(
- product_id serial primary key ,
- product_code varchar unique not null,
- product_name varchar not null,
- product_model varchar,
- sales_id integer unique not null,
- constraint fk_product_sales foreign key (sales_id) references
-sales(sales_id)
+create table if not exists product
+(
+    product_id    serial primary key,
+    product_code  varchar unique not null,
+    product_name  varchar        not null,
+    product_model varchar,
+    sales_id      integer unique not null,
+    constraint fk_product_sales foreign key (sales_id) references
+        sales (sales_id)
 );
-create table if not exists sales_plan(
- sales_plan_id serial primary key ,
- sales_id integer unique not null,
- product_id integer unique not null,
- constraint fk_sales_plan_sales foreign key (sales_id) references
-sales(sales_id),
- constraint fk_sales_plan_product foreign key (product_id) references
-product(product_id)
+create table if not exists sales_plan
+(
+    sales_plan_id serial primary key,
+    sales_id      integer unique not null,
+    product_id    integer unique not null,
+    constraint fk_sales_plan_sales foreign key (sales_id) references
+        sales (sales_id),
+    constraint fk_sales_plan_product foreign key (product_id) references
+        product (product_id)
 );
-create table if not exists price(
- price_id serial primary key ,
- unit_price integer not null,
- quantity integer not null,
- sales_plan_id integer unique not null,
- constraint fk_price_sales_plan foreign key (sales_plan_id) references
-sales_plan(sales_plan_id)
+create table if not exists price
+(
+    price_id      serial primary key,
+    unit_price    integer        not null,
+    quantity      integer        not null,
+    sales_plan_id integer unique not null,
+    constraint fk_price_sales_plan foreign key (sales_plan_id) references
+        sales_plan (sales_plan_id)
 );
-create table if not exists date(
- date_id serial primary key ,
- estimated_delivery_date varchar not null,
- lodgement_date varchar,
- contract_date varchar,
- sales_plan_id integer unique not null,
- constraint fk_date_sales_plan foreign key (date_id) references
-sales_plan(sales_plan_id)
+create table if not exists date
+(
+    date_id                 serial primary key,
+    estimated_delivery_date varchar        not null,
+    lodgement_date          varchar,
+    contract_date           varchar,
+    sales_plan_id           integer unique not null,
+    constraint fk_date_sales_plan foreign key (date_id) references
+        sales_plan (sales_plan_id)
 );
-create table if not exists salesman(
- salesman_id serial primary key,
- salesman_number integer not null,
- salesman varchar unique not null,
- age integer,
- gender varchar(2) not null,
- mobile_phone varchar not null,
- sales_plan_id integer unique not null,
- constraint fk_salesman_sales_plan foreign key (salesman_id) references
-sales_plan(sales_plan_id)
-);
-
-create table if not exists supply_center(
- supply_center_id serial primary key,
- supply_center varchar unique not null,
- director varchar not null
-);
-create table if not exists country_city(
- country_city_id serial primary key,
- country varchar not null,
- city varchar unique
-);
-create table if not exists address(
- address_id serial primary key,
- supply_center_id integer unique not null,
- country_city_id integer not null,
- constraint fk_address_supply_center foreign key (supply_center_id) references
-supply_center(supply_center_id),
- constraint fk_address_country_city foreign key (country_city_id) references
-country_city(country_city_id)
-);
-create table if not exists client(
- client_id serial primary key,
- client_enterprise varchar unique not null,
- industry varchar not null,
- address_id integer unique not null,
- contract_id integer unique not null,
- constraint fk_client_contract foreign key (contract_id) references
-contract(contract_id),
- constraint fk_client_address foreign key (address_id) references
-address(address_id)
+create table if not exists salesman
+(
+    salesman_id     serial primary key,
+    salesman_number integer        not null,
+    salesman        varchar unique not null,
+    age             integer,
+    gender          varchar(2)     not null,
+    mobile_phone    varchar        not null,
+    sales_plan_id   integer unique not null,
+    constraint fk_salesman_sales_plan foreign key (salesman_id) references
+        sales_plan (sales_plan_id)
 );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-create table if not exists contract(
-  contract_number varchar not null primary key,
-  contract_date varchar not null
+create table if not exists supply_center
+(
+    supply_center_id serial primary key,
+    supply_center    varchar unique not null,
+    director         varchar        not null
+);
+create table if not exists country_city
+(
+    country_city_id serial primary key,
+    country         varchar not null,
+    city            varchar unique
+);
+create table if not exists address
+(
+    address_id       serial primary key,
+    supply_center_id integer unique not null,
+    country_city_id  integer        not null,
+    constraint fk_address_supply_center foreign key (supply_center_id) references
+        supply_center (supply_center_id),
+    constraint fk_address_country_city foreign key (country_city_id) references
+        country_city (country_city_id)
+);
+create table if not exists client
+(
+    client_id         serial primary key,
+    client_enterprise varchar unique not null,
+    industry          varchar        not null,
+    address_id        integer unique not null,
+    contract_id       integer unique not null,
+    constraint fk_client_contract foreign key (contract_id) references
+        contract (contract_id),
+    constraint fk_client_address foreign key (address_id) references
+        address (address_id)
 );
 
-create table if not exists supply_center(
- supply_center varchar not null primary key,
- director varchar not null
+
+
+create table if not exists contract
+(
+    contract_number varchar not null primary key,
+    contract_date   varchar not null
 );
 
-create table if not exists address(
- address_id serial primary key,
- supply_center varchar unique not null,
- country varchar not null,
- city varchar,
- constraint fk_address_supply_center foreign key (supply_center) references
-supply_center(supply_center)
+create table if not exists supply_center
+(
+    supply_center varchar not null primary key,
+    director      varchar not null
 );
 
-create table if not exists client(
- client_enterprise varchar not null primary key,
- industry varchar unique not null,
- address_id integer unique not null,
- contract_number varchar unique not null,
- constraint fk_client_contract foreign key (contract_number) references
-contract(contract_number),
- constraint fk_client_address foreign key (address_id) references
-address(address_id)
+create table if not exists address
+(
+    address_id    serial primary key,
+    supply_center varchar unique not null,
+    country       varchar        not null,
+    city          varchar,
+    constraint fk_address_supply_center foreign key (supply_center) references
+        supply_center (supply_center)
 );
 
-create table if not exists order(
- order_id serial primary key,
- contract_number varchar unique not null,
- constraint fk_order_contract foreign key (contract_number) references
-contract(contract_number)
+create table if not exists client
+(
+    client_enterprise varchar        not null primary key,
+    industry          varchar unique not null,
+    address_id        integer unique not null,
+    contract_number   varchar unique not null,
+    constraint fk_client_contract foreign key (contract_number) references
+        contract (contract_number),
+    constraint fk_client_address foreign key (address_id) references
+        address (address_id)
 );
 
-create table if not exists product(
- order_id integer not null primary key,
- product_code varchar unique not null,
- product_name varchar not null,
- product_model varchar not null,
- unit_price integer not null,
- quantity integer not null,
- estimated_delivery_date varchar,
- lodgement_date varchar,
- constraint fk_product_order foreign key (order_id) references
-order(order_id)
+create table if not exists order
+(
+    order_id        serial primary key,
+    contract_number varchar unique not null,
+    constraint fk_order_contract foreign key (contract_number) references
+        contract (contract_number)
 );
 
-create table if not exists salesman(
- salesman_number integer not null primary key,
- salesman varchar unique not null,
- age integer,
- gender varchar(2) not null,
- mobile_phone varchar not null,
- order_id integer unique not null,
- supply_center varchar not null,
- constraint fk_salesman_order foreign key (order_id) references
-order(order_id),
- constraint fk_salesman_supply_center foreign key (supply_center) references
-supply_center(supply_center)
+create table if not exists product
+(
+    order_id                integer        not null primary key,
+    product_code            varchar unique not null,
+    product_name            varchar        not null,
+    product_model           varchar        not null,
+    unit_price              integer        not null,
+    quantity                integer        not null,
+    estimated_delivery_date varchar,
+    lodgement_date          varchar,
+    constraint fk_product_order foreign key (order_id) references
+        order (order_id)
+);
+
+create table if not exists salesman
+(
+    salesman_number integer        not null primary key,
+    salesman        varchar unique not null,
+    age             integer,
+    gender          varchar(2)     not null,
+    mobile_phone    varchar        not null,
+    order_id        integer unique not null,
+    supply_center   varchar        not null,
+    constraint fk_salesman_order foreign key (order_id) references
+        order (order_id),
+    constraint fk_salesman_supply_center foreign key (supply_center) references
+        supply_center (supply_center)
 );
