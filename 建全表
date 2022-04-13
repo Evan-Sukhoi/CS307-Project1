@@ -1,0 +1,23 @@
+create table if not exists sustc(
+    id serial primary key,
+    contract_number varchar(12) not null,
+    client_enterprise varchar(50) not null,
+    supply_center varchar(20) not null,
+    country varchar(30) not null,
+    city varchar(12),
+    industry varchar(40) not null,
+    product_code varchar(9) not null,
+    product_name varchar(70) not null,
+    product_model varchar(70) not null,
+    unit_price integer not null,
+    quantity integer not null,
+    contract_date varchar(12) not null,
+    estimated_delivery_date varchar(12),
+    lodgement_date varchar(12),
+    director varchar(20) not null,
+    salesman varchar(20) not null,
+    salesman_number integer not null,
+    age integer not null,
+    gender varchar(8) not null,
+    mobile_phone varchar(12) not null
+);
