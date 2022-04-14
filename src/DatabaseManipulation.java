@@ -17,7 +17,7 @@ public class DatabaseManipulation implements DataManipulation {
     private String port = "5432";
 
     private static PreparedStatement  stmt = null;
-    private static final int  BATCH_SIZE = 500;
+    private static final int  BATCH_SIZE = 100;
     private static String Loader =
             "insert into sustc(contract_number,client_enterprise,supply_center,country,city,industry," +
                     "product_code,product_name,product_model, unit_price,quantity," +
@@ -169,10 +169,10 @@ public class DatabaseManipulation implements DataManipulation {
         return sb.toString();
     }
 
-    //bug
+
     public String findSalesmanBySalesmanNumber(int salesman_number) {
         StringBuilder sb = new StringBuilder();
-        String sql = "select salesman, salesman_number, gender, age, mobile_phone from salesman where salesman_number = ?;";
+        String sql = "select salesman, salesman_number, gender, age, mobile_phone, supply_center from salesman where salesman_number = ?;";
         try {
             PreparedStatement preparedStatement = con.prepareStatement(sql);
             preparedStatement.setInt(1,salesman_number);
@@ -182,7 +182,8 @@ public class DatabaseManipulation implements DataManipulation {
                 sb.append(String.format("salesman_number:%s\n",resultSet.getInt("salesman_number")));
                 sb.append(String.format("gender:%s\n",resultSet.getString("gender")));
                 sb.append(String.format("age:%d\n",resultSet.getInt("age")));
-                sb.append(String.format("mobile_phone:%s",resultSet.getString("mobile_phone from")));
+                sb.append(String.format("mobile_phone:%s\n",resultSet.getString("mobile_phone")));
+                sb.append(String.format("supply_center:%s",resultSet.getString("supply_center")));
                 sb.append(System.lineSeparator());
             }
         } catch (SQLException e) {
@@ -310,8 +311,36 @@ public class DatabaseManipulation implements DataManipulation {
     }
 
     @Override
-    public int addManySalesman(String str) {
-        return 0;
+    public int addManySalesman(String str,int num1,int num2) {
+        int result = 0;
+        int cnt = 0;
+        String sql = "insert into salesman (salesman_number,salesman,age,gender,mobile_phone,supply_center) " +
+                "values (?,?,?,?,?,?)";
+        String[] salesmanInfo = str.split(",");
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            for (int i = 0; i <= num2-num1; i++) {
+                preparedStatement.setInt(1, Integer.parseInt(salesmanInfo[0]) + num1 + i);
+                preparedStatement.setString(2, salesmanInfo[1]);
+                preparedStatement.setInt(3, Integer.parseInt(salesmanInfo[2]));
+                preparedStatement.setString(4, salesmanInfo[3]);
+                preparedStatement.setString(5, salesmanInfo[4]);
+                preparedStatement.setString(6, salesmanInfo[5]);
+                System.out.println(preparedStatement.toString());
+                preparedStatement.addBatch();
+                cnt++;
+                if (cnt % BATCH_SIZE == 0) {
+                    preparedStatement.executeBatch();
+                    preparedStatement.clearBatch();
+                }
+            }
+            if (cnt % BATCH_SIZE != 0) {
+                preparedStatement.executeBatch();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return num2 - num1;
     }
 
 
@@ -327,22 +356,59 @@ public class DatabaseManipulation implements DataManipulation {
 
     @Override
     public String deleteSalesmanByNumber(int number) {
-        StringBuilder sb = new StringBuilder();
         String sql = "delete from salesman where salesman_number = ?";
         try {
-            Statement statement = con.createStatement();
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                sb.append(resultSet.getString("supply_center")).append("\t");
-                sb.append(resultSet.getString("salesmanAmount"));
-                sb.append(System.lineSeparator());
-            }
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setInt(1, number);
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return "The salesman of"+number+"has been deleted";
+        return "The salesman of "+number+" has been deleted";
     }
+
+    @Override
+    public String deleteManySalesmenByNumber(int number,int num1, int num2) {
+        String sql = "delete from salesman where salesman_number = ?";
+        int cnt = 0;
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            for (int i = 0; i <= num2-num1; i++) {
+                preparedStatement.setInt(1, number + num1 + i);
+                preparedStatement.addBatch();
+                cnt++;
+                if (cnt % BATCH_SIZE == 0) {
+                    preparedStatement.executeBatch();
+                    preparedStatement.clearBatch();
+                }
+            }
+            if (cnt % BATCH_SIZE != 0) {
+                preparedStatement.executeBatch();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "The salesmen between "+ (number +num1) +" and "+ (number + num2) +" have been deleted";
+    }
+
+    @Override
+    public int updateSalesmenSupplyCenter(String supply_center, int number) {
+        int resultSet = 0;
+        String sql = "update salesman set supply_center = ? where salesman_number = ?;";
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setString(1,supply_center);
+            preparedStatement.setInt(2,number);
+            resultSet = preparedStatement.executeUpdate();
+            System.out.println(preparedStatement.toString());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return resultSet;
+    }
+
 
     @Override
     public int addOneColumn(String contract_number,String client_enterprise,String supply_center,

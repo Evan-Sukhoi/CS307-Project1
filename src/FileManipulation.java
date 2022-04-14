@@ -75,7 +75,7 @@ public class FileManipulation implements DataManipulation {
     }
 
     @Override
-    public int addManySalesman(String str) {
+    public int addManySalesman(String str,int num1, int num2) {
         return 0;
     }
 
@@ -92,6 +92,16 @@ public class FileManipulation implements DataManipulation {
     @Override
     public String deleteSalesmanByNumber(int number) {
         return null;
+    }
+
+    @Override
+    public String deleteManySalesmenByNumber(int number,int num1, int num2) {
+        return null;
+    }
+
+    @Override
+    public int updateSalesmenSupplyCenter(String supply_center, int number) {
+        return 0;
     }
 
     @Override

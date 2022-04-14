@@ -34,13 +34,17 @@ public interface DataManipulation {
 
     public int addOneSalesman(String str);
 
-    public int addManySalesman(String str);
+    public int addManySalesman(String str,int num1, int num2);
 
     public int addOneSupplyCenter(String str);
 
     public int addOneProductModel(String str);
 
     public String deleteSalesmanByNumber(int number);
+
+    public String deleteManySalesmenByNumber(int number,int num1,int num2);
+
+    public int updateSalesmenSupplyCenter(String supply_center, int number);
 
 
 }
