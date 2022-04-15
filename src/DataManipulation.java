@@ -1,3 +1,6 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 public interface DataManipulation {
 
     public void openDatasource();
@@ -36,15 +39,23 @@ public interface DataManipulation {
 
     public int addManySalesman(String str,int num1, int num2);
 
+    public int addManyOrder(String str,int num1, int num2);
+
     public int addOneSupplyCenter(String str);
 
     public int addOneProductModel(String str);
 
-    public String deleteSalesmanByNumber(int number);
+
+    public int addOneOrder(String str);
+
+
+    public String deleteSalesmanByNumber(int number) throws IOException;
+
+    public String deleteOrderBySalesmanNumber(int number) throws IOException;
 
     public String deleteManySalesmenByNumber(int number,int num1,int num2);
 
-    public int updateSalesmenSupplyCenter(String supply_center, int number);
+    public int updateSalesmenSupplyCenter(String supply_center, int number) throws IOException;
 
-
+    public String salesmanWithOrderCount();
 }

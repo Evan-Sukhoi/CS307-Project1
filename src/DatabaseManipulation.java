@@ -344,6 +344,8 @@ public class DatabaseManipulation implements DataManipulation {
     }
 
 
+
+
     @Override
     public int addOneSupplyCenter(String str) {
         return 0;
@@ -353,6 +355,64 @@ public class DatabaseManipulation implements DataManipulation {
     public int addOneProductModel(String str) {
         return 0;
     }
+
+    @Override
+    public int addOneOrder(String str) {
+        int result = 0;
+        String sql = "insert into orders (contract_number,product_model,salesman_number,quantity,estimated_delivery_date,lodgement_date) " +
+                "values (?,?,?,?,?,?)";
+        String[] salesmanInfo = str.split(",");
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setString(1, salesmanInfo[0]);
+            preparedStatement.setString(2, salesmanInfo[1]);
+            preparedStatement.setInt(3, Integer.parseInt(salesmanInfo[2]));
+            preparedStatement.setInt(4, Integer.parseInt(salesmanInfo[3]));
+            preparedStatement.setString(5, salesmanInfo[4]);
+            preparedStatement.setString(6, salesmanInfo[5]);
+            System.out.println(preparedStatement.toString());
+
+            result = preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public int addManyOrder(String str,int num1,int num2) {
+        int result = 0;
+        int cnt = 0;
+        String sql = "insert into orders (contract_number,product_model,salesman_number,quantity,estimated_delivery_date,lodgement_date) " +
+                "values (?,?,?,?,?,?)";
+        String[] salesmanInfo = str.split(",");
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            for (int i = 0; i <= num2-num1; i++) {
+                preparedStatement.setString(1, salesmanInfo[0]);
+                preparedStatement.setString(2, salesmanInfo[1]);
+                preparedStatement.setInt(3, Integer.parseInt(salesmanInfo[2]));
+                preparedStatement.setInt(4, Integer.parseInt(salesmanInfo[3]+ num1 + i));
+                preparedStatement.setString(5, salesmanInfo[4]);
+                preparedStatement.setString(6, salesmanInfo[5]);
+                System.out.println(preparedStatement.toString());
+                preparedStatement.addBatch();
+                cnt++;
+                if (cnt % BATCH_SIZE == 0) {
+                    preparedStatement.executeBatch();
+                    preparedStatement.clearBatch();
+                }
+            }
+            if (cnt % BATCH_SIZE != 0) {
+                preparedStatement.executeBatch();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return num2 - num1;
+    }
+
 
     @Override
     public String deleteSalesmanByNumber(int number) {
@@ -367,6 +427,21 @@ public class DatabaseManipulation implements DataManipulation {
 
         return "The salesman of "+number+" has been deleted";
     }
+
+    @Override
+    public String deleteOrderBySalesmanNumber(int number) {
+        String sql = "delete from orders where salesman_number = ?";
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setInt(1, number);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "The order of "+number+" have been deleted";
+    }
+
 
     @Override
     public String deleteManySalesmenByNumber(int number,int num1, int num2) {
@@ -407,6 +482,25 @@ public class DatabaseManipulation implements DataManipulation {
         }
 
         return resultSet;
+    }
+
+    @Override
+    public String salesmanWithOrderCount() {
+        StringBuilder sb = new StringBuilder();
+        String sql = "select salesman_number, count(*) orderAmount from orders group by salesman_number;";
+        try {
+            Statement statement = con.createStatement();
+            resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                sb.append(resultSet.getString("salesman_number")).append("\t");
+                sb.append(resultSet.getString("orderAmount"));
+                sb.append(System.lineSeparator());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
     }
 
 
