@@ -1,0 +1,69 @@
+create table supply_center
+(
+    supply_center varchar(20) not null primary key,
+    director      varchar(20) not null
+);
+
+create table client
+(
+    client_enterprise varchar(50) not null primary key,
+    industry          varchar(40) not null,
+    country           varchar(30) not null,
+    city              varchar(12),
+    supply_center     varchar(20) not null
+        constraint fk_client_supply_center
+            references supply_center
+);
+
+create table contract
+(
+    contract_number   varchar(12) not null primary key,
+    contract_date     date        not null,
+    supply_center     varchar(20) not null
+        constraint fk_contract_supply_center
+            references supply_center,
+    client_enterprise varchar(50) not null
+        constraint fk_contract_client
+            references client
+);
+
+create table salesman
+(
+    salesman_number integer     not null primary key,
+    salesman        varchar(20) not null,
+    age             integer     not null,
+    gender          varchar(8)  not null, --下面改成了char（1）
+    mobile_phone    char(11)    not null,
+    supply_center   varchar(20) not null
+        constraint fk_salesman_supply_center
+            references supply_center
+);
+alter table salesman
+    alter column gender type char(1);
+-- alter table salesman alter column salesman_number type char(8);  --可能会增加占用的空间
+
+create table product_model
+(
+    product_model varchar(70) not null primary key,
+    product_code  varchar(9)  not null, --下面改成了char（7）
+    product_name  varchar(70) not null,
+    unit_price    integer     not null
+);
+alter table product_model alter column product_code type char(7);
+
+create table orders
+(
+    orders_id               serial primary key,
+    contract_number         char(11)    not null --已改为char（11）
+        constraint fk_orders_contract
+            references contract,
+    product_model           varchar(70) not null
+        constraint product_model
+            references product_model,
+    salesman_number         integer     not null
+        constraint fk_orders_salesman
+            references salesman,
+    quantity                integer     not null,
+    estimated_delivery_date date,
+    lodgement_date          date
+);
