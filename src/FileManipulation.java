@@ -3,8 +3,10 @@ import java.util.*;
 
 public class FileManipulation implements DataManipulation {
 
-    String orders ="postgres_public_orders.csv";
-    String salesman ="postgres_public_salesman.csv";
+    String filePath = "D:\\Database Code\\project1\\";
+
+    String orders = filePath + "postgres_public_orders.csv";
+    String salesman = filePath + "postgres_public_salesman.csv";
 
     @Override
     public void openDatasource() {
@@ -39,7 +41,25 @@ public class FileManipulation implements DataManipulation {
 
     @Override
     public String findAllSalesman() {
-        return null;
+        String line;
+        int salesmanIndex = 1;
+        Set<String> supplyCenterNames = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(salesman))) {
+            bufferedReader.readLine();
+            while ((line = bufferedReader.readLine()) != null) {
+                line = line.split(",")[salesmanIndex];
+                if (!supplyCenterNames.contains(line)) {
+                    sb.append(line).append("\n");
+                    supplyCenterNames.add(line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -65,10 +85,31 @@ public class FileManipulation implements DataManipulation {
         return sb.toString();
     }
 
+    //select 查询
     @Override
     public String findAllProductModel() {
-        return null;
+        String line;
+        int supplyCenterIndex = 2;
+        Set<String> supplyCenterNames = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(orders))) {
+            bufferedReader.readLine();
+            while ((line = bufferedReader.readLine()) != null) {
+                line = line.split(",")[supplyCenterIndex];
+                if (!supplyCenterNames.contains(line)) {
+                    sb.append(line).append("\n");
+                    supplyCenterNames.add(line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
     }
+
+
 
     @Override
     public String findAllClientEnterprise() {
@@ -125,6 +166,7 @@ public class FileManipulation implements DataManipulation {
         return 0;
     }
 
+    //add
     @Override
     public int addOneOrder(String str) {
         try (BufferedWriter writer
@@ -186,6 +228,7 @@ public class FileManipulation implements DataManipulation {
         return "The salesman of "+number+" has been deleted";
     }
 
+    //delete
     @Override
     public String deleteOrderBySalesmanNumber(int number) throws IOException {
         String[] orderinf = new String[7];
@@ -201,7 +244,6 @@ public class FileManipulation implements DataManipulation {
         //遍历字符串集合
         for (String order : list) {
             orderinf = order.split(",");//将‘,‘作为分隔符，将字符串分隔开存放进入数组中
-            System.out.print(orderinf[3] + " ");
         }
 
         for (String delBook : list) {
@@ -235,6 +277,53 @@ public class FileManipulation implements DataManipulation {
     @Override
     public String deleteManySalesmenByNumber(int number,int num1, int num2) {
         return null;
+    }
+
+
+    //update
+    @Override
+    public int updateOrderQuantity(int quantity, int number) throws IOException {
+        String[] orderInf = new String[6];
+        String[] orderInf1 = new String[6];
+        File file = new File(orders);
+        FileInputStream input = new FileInputStream(file);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        String tempString;//定义一个字符串，每一次读出该行字符串内容
+        List<String> list = new ArrayList<>();//定义一个list字符串集合用来储存每一行的字符串信息
+        while ((tempString = reader.readLine()) != null) {
+            list.add(tempString);
+        }
+        //遍历字符串集合
+        for (String order : list) {
+            orderInf = order.split(",");//将‘,‘作为分隔符，将字符串分隔开存放进入数组中
+        }
+
+        for (String delBook : list) {
+            orderInf1 = delBook.split(",");
+            //找到即将删除的书籍在集合中的位置，将该部分内容从集合中删除，然后清空整个文件
+            if (Integer.toString(number).equals(orderInf1[0])) {
+                list.remove(delBook);//在集合中删除该行
+                list.add(orderInf1[0] + "," + orderInf1[1] +
+                        "," + orderInf1[2] + "," + orderInf1[3] +
+                        "," + quantity + "," + orderInf1[5] + "," + orderInf1[6]);
+                FileWriter fd = new FileWriter(file, false);//append传入false表示写入内容时将会覆盖文件中之前存在的内容
+                fd.write("");//执行删除操作，写入空内容覆盖之前的内容
+                fd.close();
+                break;
+            }
+        }
+        //重新遍历一遍更改后的集合，将内容重新写入文件内
+        for (String user : list) {
+            orderInf1 = user.split(",");
+            FileWriter fw = new FileWriter(file, true);//append传入true表示写入内容时将不会覆盖文件中之前存在的内容，将新的内容写在之前内容的后面
+            fw.write(orderInf1[0] + "," + orderInf1[1] +
+                    "," + orderInf1[2] + "," + orderInf1[3] +
+                    "," + orderInf1[4] + "," + orderInf1[5] +
+                    "," + orderInf1[6]);//执行重新写入内容的操作，将修改过的集合通过数组读下标后，再重新存写入文件中
+            fw.write(System.getProperty("line.separator"));//在段落后添加一个换行符
+            fw.close();
+        }
+        return 0;
     }
 
     @Override
